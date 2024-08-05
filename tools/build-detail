@@ -1,0 +1,72 @@
+#!/bin/sh
+set -e
+RED='\033[0;31m'
+YELLOW='\033[0;33m'
+NC='\033[0m'
+
+for_target() {
+    type=${1:-Debug}
+    system=${2:-Linux}
+    name=$1-$2
+    
+    dir="build/$name"
+    [ "$KEEP" = "1" ] || rm -rf "$dir"
+    mkdir -p "$dir"
+    (
+        cd "$dir"
+
+        printf "$YELLOW%s$NC\n" "[$name] Build ..."
+        cmake ../.. -DCMAKE_BUILD_TYPE=$type -DCMAKE_SYSTEM_NAME=$system
+        cmake --build .
+
+        if [ "$system" = "Windows" ]; then
+            files="libcdirstat.dll libcdirstat.dll.a cdirstat.exe test_string.exe test_wstring.exe"
+        else
+            files="libcdirstat.so cdirstat test_string"
+        fi
+
+        printf "$YELLOW%s$NC\n" "[$name] List files ..."
+        ls -lh $files
+
+        printf "$YELLOW%s$NC\n" "[$name] File types ..."
+        file $files
+    )
+}
+
+# Parse command arguments
+options="$(getopt -o "drk" -l "debug,release,keep" -- "$@")"
+[ $? -ne 0 ] && exit 1
+eval set -- "$options"
+
+while true; do
+    case "$1" in
+        -d|--debug)     DEBUG=1 ;;
+        -r|--release)   RELEASE=1 ;;
+        -k|--keep)      KEEP=1 ;;
+        # ----- end of option list -----
+        --) shift; break ;;
+        *)  printf "$RED%s$NC\n" "Unhandled option: $1" >&2; exit 1 ;;
+    esac
+    shift # option name
+done
+
+if [ "$DEBUG" = "1" ] && [ "$RELEASE" = "1" ]; then
+    CONFIGS="Debug Release"
+elif [ "$DEBUG" = "1" ]; then
+    CONFIGS="Debug"
+elif [ "$RELEASE" = "1" ]; then
+    CONFIGS="Release"
+else
+    CONFIGS="Debug Release"
+fi
+
+SYSTEMS="$@"
+if [ -z "$SYSTEMS" ]; then
+    SYSTEMS="Linux Windows"
+fi
+
+for config in $CONFIGS; do
+    for system in $SYSTEMS; do
+        for_target $config $system
+    done
+done

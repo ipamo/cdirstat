@@ -117,7 +117,8 @@ endif()
 include_directories(include)
 
 add_library(lib SHARED ${src} ${platform-src})
-set_target_properties(lib PROPERTIES OUTPUT_NAME cdirstat)
+set_target_properties(lib PROPERTIES OUTPUT_NAME cdirstat WINDOWS_EXPORT_ALL_SYMBOLS true)
+# TODO: how to limit exported symbols? On Linux AND on Windows?
 utils_strip(lib)
 
 add_executable(cli src/cli/main.c)

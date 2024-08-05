@@ -21,7 +21,7 @@ const char* cdirstat_commit() {
 int _cdirstat_cli(argparse_t* ap) {
     argparse_next(ap); // ignore name of program
 
-    // TODO!
+    // TODO: implement actual features
     printf_c("%d: >%s<\n", strlen("Hé"), "Hé");
     printf_c("%d: >%s<\n", strlen("He"), "He");
 

@@ -21,30 +21,59 @@ TODO: generate using Doxygen.
 
 ### Pre-requisites for Linux hosts
 
-    sudo apt install cmake build-essential gdb mingw-w64 gdb-mingw-w64 libcmocka-dev file
+Install:
+
+    sudo apt install cmake build-essential gdb mingw-w64 gdb-mingw-w64 libcmocka-dev file doxygen
+
+To build tests when cross-compiling to Windows, also compile and install `cmocka` for mingw-w64:
+
+    sudo git clone https://git.cryptomilk.org/projects/cmocka.git /usr/local/src/
+
+    cd /usr/local/src/cmocka/
+
+    sudo cmake . -B build \
+        -DCMAKE_INSTALL_PREFIX=/usr/x86_64-w64-mingw32 \
+        -DCMAKE_SYSTEM_NAME=Windows \
+        -DCMAKE_C_COMPILER=x86_64-w64-mingw32-gcc \
+        -DCMAKE_BUILD_TYPE=Release
+
+    sudo cmake --build build
+
+    sudo cmake --install build
+
 
 ### Pre-requisites for Windows hosts
 
-[Download](https://aka.ms/vs/17/release/vs_buildtools.exe) and install Visual Studio Build Tools. Enable the following components:
-- TODO
+[Download](https://aka.ms/vs/17/release/vs_buildtools.exe) and install Visual Studio Build Tools and enable CMake, MSVC, C runtime and Windows SDK components.
 
-### Build instructions
+Add CMake's `bin` directory (example: `C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin`) in your `PATH` environment variable.
+
+Specify the generator matching your version of VS Build Tools. Example:
+
+    $env:CMAKE_GENERATOR="Visual Studio 17 2022"
+
+NOTE: The generator may also be configured in your `.vscode/settings.json`. Example:
+
+    {
+        "cmake.generator": "Visual Studio 17 2022"
+    }
+
+    
+### Build instructions (common to Windows and Linux)
 
 Prepare:
 
-    mkdir -p build
-    cd build
-    cmake ..
+    cmake . -B build
 
 Build:
 
-    cmake --build .
+    cmake --build build
 
 Run unit tests:
 
-    ctest test
+    cmake --build build --target run_tests
 
-To run the command-line interface, run `./cdirstat` on Linux or `.\cdirstat.exe` on Windows (from the `build` directory).
+To run the command-line interface, run `./cdirstat` on Linux or `.\Debug\cdirstat.exe` on Windows (from the `build` directory).
 
 
 ## Legal

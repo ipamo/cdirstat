@@ -58,6 +58,20 @@ NOTE: The generator may also be configured in your `.vscode/settings.json`. Exam
         "cmake.generator": "Visual Studio 17 2022"
     }
 
+Build cmocka - TODO: follow Linux instructions instead?:
+
+    mkdir build
+    cd build
+    cmake -G "Visual Studio 17 2022" path/to/cmocka-1.1.7
+    cmake --build . --config Release
+
+Install cmocka (from an elevated prompt) :
+
+    $MSVC_PATH="C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.40.33807"
+
+    cp build\src\Release\cmocka.dll "$MSVC_PATH\bin\Hostx64\x64\"
+    cp build\src\Release\cmocka.lib "$MSVC_PATH\lib\x64\"
+    cp include\cmocka.h             "$MSVC_PATH\14.40.33807\include\"
     
 ### Build instructions (common to Windows and Linux)
 
